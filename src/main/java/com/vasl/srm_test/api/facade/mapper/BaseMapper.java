@@ -8,7 +8,9 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-public interface BaseMapper <inputDto, outputDto,inputModel,outputModel,entity>{
+public interface BaseMapper<inputDto, outputDto, inputModel, outputModel, entity>{
+
+//    InModel convertFromInToOut(InDto inputDto);
     //Input (TestUserInputDto -> inputModel -> entity)
     inputModel dtoToModel(inputDto dto);
     entity modelToEntity(inputModel inputModel);
@@ -31,6 +33,6 @@ public interface BaseMapper <inputDto, outputDto,inputModel,outputModel,entity>{
 
 
     //update
-    void updateEntity(TestUserInputModel model, @MappingTarget TestUser entity);
+    void updateEntity(TestUser newEntity, @MappingTarget TestUser entity);
 
 }

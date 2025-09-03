@@ -9,7 +9,9 @@ import com.vasl.srm_test.service.model.TestUserOutputModel;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring" , uses =  {SupportMapper.class , UserDataMapper.class})
-public interface TestUserMapper extends BaseMapper <TestUserInputDto, TestUserOutputDto, TestUserInputModel, TestUserOutputModel, TestUser>{
+public interface TestUserMapper extends BaseMapper<TestUserInputDto, TestUserOutputDto, TestUserInputModel, TestUserOutputModel, TestUser>{
+
+//    <OutModel, OutDto> OutDto convertFronOutModelToOutDto(OutModel outModel);
     /*
     //Input (TestUserInputDto -> TestUserInputModel -> TestUser)
     TestUserInputModel dtoToModel(TestUserInputDto dto);
@@ -36,3 +38,12 @@ public interface TestUserMapper extends BaseMapper <TestUserInputDto, TestUserOu
     void updateEntity(TestUserInputModel model, @MappingTarget TestUser entity);
 */
 }
+
+
+
+
+
+
+
+
+
