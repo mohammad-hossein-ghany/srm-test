@@ -6,4 +6,6 @@ import com.vasl.srm_test.service.model.TestUserOutputModel;
 public interface TestUserService {
     TestUserOutputModel getUserById(int id);
     public void delete(int id);
+
+    void deleteAll();
 }

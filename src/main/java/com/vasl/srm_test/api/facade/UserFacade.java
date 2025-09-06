@@ -27,4 +27,8 @@ public class UserFacade {
     public void delete(int id) {
         testUserService.delete(id);
     }
+
+    public void deleteAll() {
+        testUserService.deleteAll();
+    }
 }

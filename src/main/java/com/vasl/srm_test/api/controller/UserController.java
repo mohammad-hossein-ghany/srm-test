@@ -22,4 +22,9 @@ public class UserController {
     public void delete(@PathVariable int id) {
         userFacade.delete(id);
     }
+
+    @DeleteMapping
+    public void deleteAll() {
+        userFacade.deleteAll();
+    }
 }

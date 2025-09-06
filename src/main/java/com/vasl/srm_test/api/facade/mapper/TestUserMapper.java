@@ -6,11 +6,13 @@ import com.vasl.srm_test.api.dto.TestUserOutputDto;
 import com.vasl.srm_test.dal.entity.TestUser;
 import com.vasl.srm_test.service.model.TestUserInputModel;
 import com.vasl.srm_test.service.model.TestUserOutputModel;
+import com.vasl.srm_test.service.model.TestUserRemoteModel;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring" , uses =  {SupportMapper.class , UserDataMapper.class})
 public interface TestUserMapper extends BaseMapper<TestUserInputDto, TestUserOutputDto, TestUserInputModel, TestUserOutputModel, TestUser>{
 
+    TestUser fromRemoteModelToEntity(TestUserRemoteModel remoteModel);
 //    <OutModel, OutDto> OutDto convertFronOutModelToOutDto(OutModel outModel);
     /*
     //Input (TestUserInputDto -> TestUserInputModel -> TestUser)
