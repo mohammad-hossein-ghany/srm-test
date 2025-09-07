@@ -4,8 +4,12 @@ package com.vasl.srm_test.api.facade.mapper;
 import com.vasl.srm_test.dal.entity.TestUser;
 import com.vasl.srm_test.service.model.TestUserInputModel;
 
+import com.vasl.srm_test.service.model.TestUserRemoteModel;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BaseMapper<inputDto, outputDto, inputModel, outputModel, entity>{
@@ -33,6 +37,10 @@ public interface BaseMapper<inputDto, outputDto, inputModel, outputModel, entity
 
 
     //update
-    void updateEntity(TestUser newEntity, @MappingTarget TestUser entity);
+    @Mapping(target = "id", ignore = true)
+    void updateEntityFromRemoteApiCallResult(@MappingTarget TestUser entity, TestUserRemoteModel model);
+
+
+    void updateEntity(@MappingTarget TestUser targetTestUser, TestUser testUser);
 
 }

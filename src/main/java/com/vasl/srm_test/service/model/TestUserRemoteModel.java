@@ -15,12 +15,10 @@ public class TestUserRemoteModel {
     private UserDataRemoteOutputModel data;
     private SupportRemoteOutputModel support;
 
-    private LocalDateTime lastValidationTime;
-
     @Data
     public static class UserDataRemoteOutputModel {
 
-        private Integer id;
+        private String id;
 
         private String email;
 

@@ -8,11 +8,12 @@ import com.vasl.srm_test.service.model.TestUserInputModel;
 import com.vasl.srm_test.service.model.TestUserOutputModel;
 import com.vasl.srm_test.service.model.TestUserRemoteModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring" , uses =  {SupportMapper.class , UserDataMapper.class})
 public interface TestUserMapper extends BaseMapper<TestUserInputDto, TestUserOutputDto, TestUserInputModel, TestUserOutputModel, TestUser>{
 
-    TestUser fromRemoteModelToEntity(TestUserRemoteModel remoteModel);
+    TestUser fromRemoteModelToEntity(@MappingTarget TestUser testUser, TestUserRemoteModel remoteModel);
 //    <OutModel, OutDto> OutDto convertFronOutModelToOutDto(OutModel outModel);
     /*
     //Input (TestUserInputDto -> TestUserInputModel -> TestUser)

@@ -9,3 +9,9 @@ spring:
       port: 27017
       database: myDb
 
+
+
+reqres:
+  api:
+    url: https://reqres.in/api/users/{id}
+    apiKeyValue: reqres-free-v1

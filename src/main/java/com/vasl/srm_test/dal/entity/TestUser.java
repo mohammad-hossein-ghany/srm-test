@@ -13,4 +13,14 @@ public class TestUser extends BaseEntity {
     private Support support;
 
     private LocalDateTime lastValidationTime;
+
+    public TestUser(){
+
+    }
+
+    public TestUser(int id) {
+        this.data = new UserData();
+        this.data.setId(id);
+        this.support = new Support();
+    }
 }
