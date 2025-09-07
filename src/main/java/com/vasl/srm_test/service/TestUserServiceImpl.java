@@ -2,6 +2,7 @@ package com.vasl.srm_test.service;
 
 import com.vasl.srm_test.api.facade.mapper.TestUserMapper;
 import com.vasl.srm_test.config.UrlApiConfig;
+import com.vasl.srm_test.dal.entity.ApiRemoteProvider;
 import com.vasl.srm_test.dal.entity.TestUser;
 import com.vasl.srm_test.dal.repository.TestUserRepository;
 import com.vasl.srm_test.service.model.TestUserOutputModel;
@@ -17,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -27,15 +27,78 @@ public class TestUserServiceImpl implements TestUserService {
     private final TestUserMapper testUserMapper;
     private final RestTemplate restTemplate;
     private final UrlApiConfig apiConfig;
+    private final TestUserLogService testUserLogService;
+
+    @Override
+    public void delete(int id) {
+        TestUser entity = testUserRepository.findByUserDataId(id).orElseThrow();
+        testUserRepository.delete(entity);
+    }
+
+
+    @Override
+    public void deleteAll() {
+        testUserRepository.deleteAll();
+    }
+
+
+    @Override
+    public TestUserOutputModel getUserById(int id) {
+
+        ApiRemoteProvider apiRemoteProvider;
+        TestUser testUser;
+        Optional<TestUser> existedTestUser = testUserRepository.findByUserDataId(id);
+
+        if (existedTestUser.isEmpty()) {
+            apiRemoteProvider = ApiRemoteProvider.FIRST_REMOTE_API;
+            testUser = new TestUser(id);
+            callRemoteApiAndUpdateEntity(testUser);
+        } else {
+            testUser = existedTestUser.get();
+            if (testUser.getLastValidationTime().isAfter(LocalDateTime.now())) {
+                apiRemoteProvider = ApiRemoteProvider.CACHE;
+                testUserLogService.addLog(testUser, apiRemoteProvider);
+                return testUserMapper.entityToModel(testUser);
+            } else {
+                apiRemoteProvider = ApiRemoteProvider.FIRST_REMOTE_API;
+                callRemoteApiAndUpdateEntity(testUser);
+            }
+        }
+
+        testUser.setLastValidationTime(getExpireTime());
+        testUserRepository.save(testUser);
+        testUserLogService.addLog(testUser, apiRemoteProvider);
+
+        return testUserMapper.entityToModel(testUser);
+    }
+
+
+    //Methods
+    private final String apiKey = "x-api-key";
+
+    private void callRemoteApiAndUpdateEntity(TestUser testUser) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(apiKey, apiConfig.getApiKeyValue());
+        HttpEntity<Void> httpEntity = new HttpEntity<>(httpHeaders);
+        String apiUrl = apiConfig.getUrl().replace("{id}", String.valueOf(testUser.getData().getId()));
+        ResponseEntity<TestUserRemoteModel> response = restTemplate.exchange(apiUrl, HttpMethod.GET, httpEntity, TestUserRemoteModel.class);
+
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to fetch user from remote API");
+        }
+        testUserMapper.fromRemoteModelToEntity(testUser, response.getBody());
+    }
+
 
     public LocalDateTime getExpireTime() {
         return LocalDateTime.now(ZoneId.of("Asia/Tehran")).plusMinutes(1);
     }
 
 
-    private final String apiKey = "x-api-key";
 
 
+/*
 //    @Override
 //    public TestUserOutputModel getUserById(int id) {
 //
@@ -59,19 +122,9 @@ public class TestUserServiceImpl implements TestUserService {
 //        testUser = testUserRepository.save(testUser);
 //        return testUserMapper.entityToModel(testUser);
 //    }
-    private void callRemoteApiAndUpdateEntity(TestUser testUser) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(apiKey, apiConfig.getApiKeyValue());
-        HttpEntity<Void> httpEntity = new HttpEntity<>(httpHeaders);
-        String apiUrl = apiConfig.getUrl().replace("{id}", String.valueOf(testUser.getData().getId()));
-        ResponseEntity<TestUserRemoteModel> response = restTemplate.exchange(apiUrl, HttpMethod.GET, httpEntity, TestUserRemoteModel.class);
 
+ */
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Failed to fetch user from remote API");
-        }
-        testUserMapper.fromRemoteModelToEntity(testUser, response.getBody());
-    }
 
 //    private TestUser callAndSaveUser(TestUser testUser) {
 //
@@ -163,39 +216,6 @@ public class TestUserServiceImpl implements TestUserService {
     String apiUrl = "https://reqres.in/api/users/" + id;
     ResponseEntity<TestUserRemoteModel> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, httpEntity, TestUserRemoteModel.class);
 */
-    @Override
-    public void delete(int id) {
-        TestUser entity = testUserRepository.findByUserDataId(id).orElseThrow();
-        testUserRepository.delete(entity);
-    }
-
-    @Override
-    public void deleteAll() {
-        testUserRepository.deleteAll();
-    }
-
-
-    public TestUserOutputModel getUserById(int id) {
-
-        TestUser testUser;
-        Optional<TestUser> existedTestUser = testUserRepository.findByUserDataId(id);
-        if (existedTestUser.isEmpty()) {
-            testUser = new TestUser(id);
-            callRemoteApiAndUpdateEntity(testUser);
-        } else {
-            testUser = existedTestUser.get();
-            if (testUser.getLastValidationTime().isAfter(LocalDateTime.now())) {
-                return testUserMapper.entityToModel(testUser);
-            } else {
-                callRemoteApiAndUpdateEntity(testUser);
-            }
-        }
-
-        testUser.setLastValidationTime(getExpireTime());
-        testUserRepository.save(testUser);
-        return testUserMapper.entityToModel(testUser);
-
-    }
 
 
 }
