@@ -11,5 +11,8 @@ public class TestUserOutputModel{
     private UserDataOutputModel data;
     private SupportOutputModel support;
 
+    private Integer totalCount;
+    private Integer monthlyCount;
+
     private LocalDateTime lastValidationTime;
 }

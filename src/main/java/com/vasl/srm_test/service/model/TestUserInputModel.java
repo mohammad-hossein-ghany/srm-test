@@ -11,5 +11,8 @@ public class TestUserInputModel {
     private UserDataInputModel data;
     private SupportInputModel support;
 
+    private Integer totalCount;
+    private Integer monthlyCount;
+
     private LocalDateTime lastValidationTime;
 }

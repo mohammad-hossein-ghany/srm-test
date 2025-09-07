@@ -11,5 +11,8 @@ public class TestUserOutputDto{
     private UserDataOutputDto data;
     private SupportOutputDto support;
 
+    private Integer totalCount;
+    private Integer monthlyCount;
+
     private LocalDateTime lastValidationTime;
 }

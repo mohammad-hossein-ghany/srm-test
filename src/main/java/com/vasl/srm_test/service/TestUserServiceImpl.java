@@ -53,27 +53,32 @@ public class TestUserServiceImpl implements TestUserService {
             apiRemoteProvider = ApiRemoteProvider.FIRST_REMOTE_API;
             testUser = new TestUser(id);
             callRemoteApiAndUpdateEntity(testUser);
+//            loggingCounter(testUser);
         } else {
             testUser = existedTestUser.get();
             if (testUser.getLastValidationTime().isAfter(LocalDateTime.now())) {
                 apiRemoteProvider = ApiRemoteProvider.CACHE;
                 testUserLogService.addLog(testUser, apiRemoteProvider);
+                loggingCounter(testUser);
+                testUser = testUserRepository.save(testUser);
                 return testUserMapper.entityToModel(testUser);
             } else {
                 apiRemoteProvider = ApiRemoteProvider.FIRST_REMOTE_API;
                 callRemoteApiAndUpdateEntity(testUser);
+//                loggingCounter(testUser);
             }
         }
 
         testUser.setLastValidationTime(getExpireTime());
         testUserRepository.save(testUser);
         testUserLogService.addLog(testUser, apiRemoteProvider);
+        loggingCounter(testUser);
 
         return testUserMapper.entityToModel(testUser);
     }
 
+    //--------------------------------------------------<Methods>--------------------------------------------------
 
-    //Methods
     private final String apiKey = "x-api-key";
 
     private void callRemoteApiAndUpdateEntity(TestUser testUser) {
@@ -92,10 +97,25 @@ public class TestUserServiceImpl implements TestUserService {
 
 
     public LocalDateTime getExpireTime() {
-        return LocalDateTime.now(ZoneId.of("Asia/Tehran")).plusMinutes(1);
+        return LocalDateTime.now(ZoneId.of("Asia/Tehran")).plusMonths(1);
     }
 
 
+    public void loggingCounter(TestUser testUser) {
+
+        if (testUser.getTotalCount() == null) {
+            testUser.setTotalCount(1);
+        } else {
+            testUser.setTotalCount(testUser.getTotalCount() + 1);
+        }
+
+        if (testUser.getMonthlyCount() == null || (testUser.getLastModifiedDate().getMonth() != LocalDateTime.now().getMonth())) {
+            testUser.setMonthlyCount(1);
+        } else {
+            testUser.setMonthlyCount(testUser.getMonthlyCount() + 1);
+        }
+
+    }
 
 
 /*

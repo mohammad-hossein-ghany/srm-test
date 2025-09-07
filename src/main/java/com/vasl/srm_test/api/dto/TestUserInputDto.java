@@ -11,5 +11,8 @@ public class TestUserInputDto{
     private UserDataInputDto data;
     private SupportInputDto support;
 
+    private Integer totalCount;
+    private Integer monthlyCount;
+
     private LocalDateTime lastValidationTime;
 }
